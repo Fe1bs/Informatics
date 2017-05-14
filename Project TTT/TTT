@@ -1,1 +1,186 @@
+import os
+import time
 
+#Feld
+
+listFeld = ['-', '-', '-', '-', '-', '-', '-', '-', '-']
+def feld(ListeAlsFeld):
+        n = 0
+        for i in ListeAlsFeld:
+            n = n + 1
+            print(i, end=' ')
+            if n %3 == 0:
+                print('')
+
+#player oder AI
+
+def porcomp():
+    print('Player vs Player   : press 1\nPlayer vs Computer : press 2')
+    auswahl = 'notyet'
+    while not(auswahl == '1' or auswahl == '2'):
+        auswahl = input()
+        if auswahl == '1':
+            return 'pvp'
+        if auswahl == '2':
+            return 'pvc'
+        else:
+            print('Es gibt nur PvP oder PvC')
+
+# x oder o
+
+def xodero():
+    print('x oder o? ')
+    auswahl = 'notyet'
+    while not(auswahl == 'x' or auswahl == 'o'):
+        auswahl = input()
+        if auswahl == 'x':
+            os.system('cls')
+            print('\nx beginnt')
+            return 'x'
+        if auswahl == 'o':
+            os.system('cls')
+            print('\no beginnt')
+            return 'o'
+        else:
+            print('Es gibt nur x oder o')
+
+#playermove
+
+def playermove(player):
+    global weramzug
+    a = int(input())
+    if a-1 < 9 and listFeld[a-1] == '-':
+        listFeld[a-1] = player
+        os.system('cls')
+        feld(listFeld)
+        weramzug = 0
+    else:
+        print('geht nicht!')
+
+#wann gewinnt wer?
+
+def gamewin():
+
+    if (listFeld[0] == 'x' and listFeld[1] == 'x' and listFeld[2] == 'x' or
+        listFeld[3] == 'x' and listFeld[4] == 'x' and listFeld[5] == 'x' or
+        listFeld[6] == 'x' and listFeld[7] == 'x' and listFeld[8] == 'x' or
+        listFeld[0] == 'x' and listFeld[3] == 'x' and listFeld[6] == 'x' or
+        listFeld[1] == 'x' and listFeld[4] == 'x' and listFeld[7] == 'x' or
+        listFeld[2] == 'x' and listFeld[5] == 'x' and listFeld[8] == 'x' or
+        listFeld[0] == 'x' and listFeld[4] == 'x' and listFeld[8] == 'x' or
+        listFeld[2] == 'x' and listFeld[4] == 'x' and listFeld[6] == 'x'):
+            return 'x'
+
+    if (listFeld[0] == 'o' and listFeld[1] == 'o' and listFeld[2] == 'o' or
+        listFeld[3] == 'o' and listFeld[4] == 'o' and listFeld[5] == 'o' or
+        listFeld[6] == 'o' and listFeld[7] == 'o' and listFeld[8] == 'o' or
+        listFeld[0] == 'o' and listFeld[3] == 'o' and listFeld[6] == 'o' or
+        listFeld[1] == 'o' and listFeld[4] == 'o' and listFeld[7] == 'o' or
+        listFeld[2] == 'o' and listFeld[5] == 'o' and listFeld[8] == 'o' or
+        listFeld[0] == 'o' and listFeld[4] == 'o' and listFeld[8] == 'o' or
+        listFeld[2] == 'o' and listFeld[4] == 'o' and listFeld[6] == 'o'):
+            return 'o'
+
+    return 'notyet'
+
+
+#computer
+
+maxplay = 0
+def calculation():
+    if gamewin() == playerzeichen:
+        return -10
+    elif gamewin() == compzeichen:
+        return 10
+    else:
+        return 0
+
+def max():
+    global maxplay
+    if gamewin() != 'notyet' or '-' not in listFeld:
+        return calculation()
+    max_score = -1000
+    max_index = 0
+    for i in range(9):
+        if listFeld[i] == '-':
+            listFeld[i] = compzeichen
+            score = min()
+            listFeld[i] = '-'
+            if score > max_score:
+                max_index = i
+                max_score = score
+    maxplay = max_index
+    return max_score
+
+def min():
+    if gamewin() != 'notyet' or '-' not in listFeld:
+        return calculation()
+    min_score = 1000
+    for i in range(9):
+        if listFeld[i] == '-':
+            listFeld[i] = playerzeichen
+            score = max()
+            listFeld[i] = '-'
+            if score < min_score:
+                min_score = score
+    return min_score
+
+
+#game am been
+
+weramzug = 1
+pai = porcomp()
+playerzeichen = xodero()
+feld(listFeld)
+gameover = 'notyet'
+if pai == 'pvp':
+    while gameover == 'notyet':
+        gameover = gamewin()
+        if gameover != 'notyet':
+            print('\n' + gameover + ' gewinnt diese Runde!')
+            time.sleep(5)
+            break
+
+        if playerzeichen == 'x':
+            playermove(playerzeichen)
+            playerzeichen = 'o'
+        else:
+            playermove(playerzeichen)
+            playerzeichen = 'x'
+
+
+        if '-' not in listFeld and gameover == 'notyet':
+            print('\nunentschieden...')
+            time.sleep(5)
+            break
+
+
+if pai == 'pvc':
+    if playerzeichen == 'x':
+        compzeichen = 'o'
+    else:
+        compzeichen = 'x'
+
+    while gameover == 'notyet':
+        gameover = gamewin()
+        if gameover != 'notyet':
+            print('\n' + gameover + ' gewinnt diese Runde!')
+            time.sleep(5)
+            break
+
+
+        if weramzug == 1:
+            playermove(playerzeichen)
+        if weramzug == 0:
+            max()
+            play = maxplay
+            listFeld[play] = compzeichen
+            os.system('cls')
+            print('\n')
+            feld(listFeld)
+            weramzug = 1
+
+        if '-' not in listFeld and gameover == 'notyet':
+            print('\nunentschieden...')
+            time.sleep(5)
+            break
